@@ -1,0 +1,23 @@
+clc;clear;
+data=readtable("约束条件系数.xlsx");
+beita=table2array(data(:,2));%品类的平均损耗率
+P=readtable("7月1日批发价.xlsx");
+num=66;
+p=table2array(P);%批发价
+fun=@(x)-(x(1:33)*(beita.*x(34:66)')-x(34:66)*p);%目标函数
+A=[];
+b=[];
+Aeq=table2array(data(:,3:68));
+beq=table2array(data(:,1));
+lb=zeros(66,1);
+ub=[];
+[x,fval]=ga(fun,num,A,b,Aeq,beq,lb,ub);
+for i=1:66
+    if(x(i)<0.01)
+        x(i)=x(i)*1000;
+    elseif(x(i)<0.1)
+          x(i)=x(i)*100;  
+    elseif(x(i)<1)
+            x(i)=x(i)+5; 
+    end
+end

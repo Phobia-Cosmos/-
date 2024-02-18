@@ -1,0 +1,21 @@
+clc;clear;
+beita=readtable("附件4.xlsx");
+beita=table2array(beita(:,3))*0.01;
+beita=[beita(1);beita(3);beita(5);beita(6);beita(4);beita(2)];%品类的平均损耗率
+P=readtable("2023年7月1-7日批发价.xlsx");
+for i=1:7
+p=table2array(P(i,2:end))';%未来一周第i天各品类批发价
+fun=@(x)-(x(1:6)*((1-beita).*x(7:12)')-x(7:12)*p);%目标函数
+A=[];
+b=[];
+Aeq=zeros(6,12);
+Aeq(1,1)=2.629;Aeq(2,2)=11.55;Aeq(3,3)=1.144;
+Aeq(4,4)=1.105;Aeq(5,5)=4.977;Aeq(6,6)=2.412;
+Aeq(1,7)=(1-beita(1));Aeq(2,8)=(1-beita(2));Aeq(3,9)=(1-beita(3));
+Aeq(4,10)=(1-beita(4));Aeq(5,11)=(1-beita(5));Aeq(6,12)=(1-beita(6));
+beq=[63.66;255.5;95.87;30.59;130.4;62.72];
+lb=[0;0;0;0;0;0;0;0;0;0;0;0];
+ub=[];
+[x,fval]=ga(fun,12,A,b,Aeq,beq,lb,ub);
+answer(i,:)=x;
+end
